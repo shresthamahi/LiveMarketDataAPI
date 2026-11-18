@@ -1,0 +1,29 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15
+    container_name: riskshield-postgres
+    environment:
+      POSTGRES_USER: risk_user
+      POSTGRES_PASSWORD: risk_password
+      POSTGRES_DB: risk_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  kafka:
+    image: docker.redpanda.com/redpandadata/redpanda:v26.2.6
+    container_name: riskshield-kafka
+    command:
+      - redpanda start
+      - --smp 1
+      - --overprovisioned
+      - --kafka-addr internal://0.0.0.0:9092,external://0.0.0.0:19092
+      - --advertise-kafka-addr internal://kafka:9092,external://localhost:19092
+    ports: 
+      - "19092:19092"
+
+volumes:
+  postgres_data:
